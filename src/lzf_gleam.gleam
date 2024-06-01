@@ -1,3 +1,4 @@
+/// Library to handle LZF compression and decompression
 import gleam/bit_array
 import gleam/dict.{type Dict}
 import gleam/int
@@ -6,13 +7,15 @@ import gleam/result
 import gleam/string
 import lzf_gleam/internal/back_ref.{type BackRef, BackRef}
 
+/// Compress an input string, returns an LZF compressed BitArray
 pub fn compress(input: String) -> BitArray {
   input
   |> bit_array.from_string
   |> process_input(0, dict.new(), <<>>, <<>>, 0)
 }
 
-pub fn decompress(data: BitArray) -> Result(String, String) {
+/// Decompress a BitArray, this may fail if the LZF compressed BitArray is malformed
+pub fn decompress(data: BitArray) -> Result(String, DecompressError) {
   let result =
     data
     |> process_decompress(0, 0, <<>>)
@@ -20,8 +23,13 @@ pub fn decompress(data: BitArray) -> Result(String, String) {
 
   case result {
     Ok(data) -> Ok(data)
-    Error(_) -> Error("Unable to convert bit array to string")
+    Error(_) -> Error(DecompressError)
   }
+}
+
+/// Error occurred deccompressing the BitArray
+pub type DecompressError {
+  DecompressError
 }
 
 fn process_decompress(
