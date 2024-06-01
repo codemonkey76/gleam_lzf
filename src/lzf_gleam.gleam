@@ -1,10 +1,10 @@
-import back_ref.{type BackRef, BackRef}
 import gleam/bit_array
 import gleam/dict.{type Dict}
 import gleam/int
 import gleam/io
 import gleam/result
 import gleam/string
+import internal/back_ref.{type BackRef, BackRef}
 
 pub fn compress(input: String) -> BitArray {
   input

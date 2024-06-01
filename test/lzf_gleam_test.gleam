@@ -1,9 +1,8 @@
 import gleam/bit_array
-import gleam/io
 import gleam/result
 import gleeunit
 import gleeunit/should
-import lzf
+import lzf_gleam as lzf
 
 pub fn main() {
   gleeunit.main()
@@ -47,7 +46,6 @@ I do not like green eggs and ham.
 pub fn roundtrip_complex_test() {
   poem
   |> lzf.compress
-  |> io.debug
   |> lzf.decompress
   |> should.be_ok
   |> should.equal(poem)

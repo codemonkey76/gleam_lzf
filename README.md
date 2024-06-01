@@ -12,8 +12,13 @@ gleam add lzf_gleam
 import lzf
 
 pub fn main() {
+  // Compression:
   "abcabcabcabcabcabc" |> compress
-  // <<3, 97, 98, 99, 240, 3, 240, 9, 1, 99>> 
+  // <<3, 97, 98, 99, 240, 3, 240, 9, 1, 99>>
+  
+  // Decompression
+  <<3, 97, 98, 99, 240, 3, 240, 9, 1, 99>> |> decompress
+  // "abcabcabcabcabcabc"
 }
 ```
 
