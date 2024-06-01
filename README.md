@@ -1,12 +1,12 @@
-# gleam_lzf
+# lzf_gleam
 
 Compress and decompress using LZF algorithm
 
-[![Package Version](https://img.shields.io/hexpm/v/gleam_lzf)](https://hex.pm/packages/gleam_lzf)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/lzf/)
+[![Package Version](https://img.shields.io/hexpm/v/lzf_gleam)](https://hex.pm/packages/lzf_gleam)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/lzf_gleam/)
 
 ```sh
-gleam add gleam_lzf
+gleam add lzf_gleam
 ```
 ```gleam
 import lzf
@@ -17,7 +17,7 @@ pub fn main() {
 }
 ```
 
-Further documentation can be found at <https://hexdocs.pm/gleam_lzf>.
+Further documentation can be found at <https://hexdocs.pm/lzf_gleam>.
 
 ## Development
 
