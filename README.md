@@ -8,6 +8,11 @@ Compress and decompress using LZF algorithm
 ```sh
 gleam add lzf_gleam
 ```
+
+## Quickstart
+
+To use this LZF compression/decompression library, you will need to create a new Gleam project and add lzf dependency
+
 ```gleam
 import lzf
 
