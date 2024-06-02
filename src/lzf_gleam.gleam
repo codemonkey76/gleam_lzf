@@ -2,9 +2,7 @@
 import gleam/bit_array
 import gleam/dict.{type Dict}
 import gleam/int
-import gleam/io
 import gleam/result
-import gleam/string
 import lzf_gleam/internal/back_ref.{type BackRef, BackRef}
 
 /// Compress an input string, returns an LZF compressed BitArray
@@ -44,8 +42,6 @@ fn process_decompress(
     <<_:size(cursor), control:1, len:3, offset:12, _:bits>> if control == 1 -> {
       let ref = BackRef(len, offset)
 
-      print_backref(ref, output, output_pos)
-
       case process_backreference(output_pos, ref, output) {
         Ok(output) ->
           process_decompress(data, input_pos + 2, output_pos + ref.len, output)
@@ -56,7 +52,6 @@ fn process_decompress(
       case process_literals(data, input_pos + 1, len, output) {
         Ok(output) -> {
           let output_pos = output_pos + len
-          print_literal(output, len, output_pos)
           process_decompress(data, input_pos + len + 1, output_pos, output)
         }
         Error(_) -> Error(Nil)
@@ -124,8 +119,7 @@ fn process_input(
       )
     }
     <<_:size(cursor), rest:bits>> -> {
-      let output =
-        flush_literals(output, literal_buffer, literal_count, current_pos)
+      let output = flush_literals(output, literal_buffer, literal_count)
       let size = bit_array.byte_size(rest)
       <<output:bits, size:8, rest:bits>>
     }
@@ -186,9 +180,7 @@ fn process_match(
       let match_len = get_match_len(input, match_pos, current_pos)
       let token = BackRef(match_len, diff)
 
-      let output =
-        flush_literals(output, literal_buffer, literal_count, current_pos)
-      print_backref(token, input, current_pos)
+      let output = flush_literals(output, literal_buffer, literal_count)
       let token = back_ref.to_bit_array(token)
       process_input(
         input,
@@ -214,16 +206,9 @@ fn process_match(
   }
 }
 
-fn flush_literals(
-  output: BitArray,
-  buffer: BitArray,
-  count: Int,
-  pos: Int,
-) -> BitArray {
+fn flush_literals(output: BitArray, buffer: BitArray, count: Int) -> BitArray {
   case count > 0 {
     True -> {
-      print_literal(buffer, count, pos)
-
       let control_byte = create_control_byte(count)
       <<output:bits, control_byte:bits, buffer:bits>>
     }
@@ -262,36 +247,4 @@ fn match_len_recursive(seq1: BitArray, seq2: BitArray, acc: Int) -> Int {
       acc
     }
   }
-}
-
-fn print_literal(data: BitArray, len: Int, pos: Int) {
-  let size = { bit_array.byte_size(data) - len } * 8
-  case data {
-    <<_:size(size), chars:bits>> -> {
-      let assert Ok(chars) = bit_array.to_string(chars)
-      io.println(
-        "[LITERAL] - pos: "
-        <> string.pad_left(int.to_string(pos), 4, " ")
-        <> ", len: "
-        <> string.pad_left(int.to_string(len), 3, " ")
-        <> ",                 chars: "
-        <> string.inspect(chars),
-      )
-    }
-    _ -> panic as "unable to print chars"
-  }
-}
-
-fn print_backref(ref: BackRef, data: BitArray, pos: Int) {
-  io.print(
-    "[BACKREF] - pos: "
-    <> string.pad_left(int.to_string(pos), 4, " ")
-    <> ", len: "
-    <> string.pad_left(int.to_string(ref.len), 3, " ")
-    <> ", offset: "
-    <> string.pad_left(int.to_string(ref.offset), 4, " ")
-    <> ", content: ",
-  )
-  let assert Ok(token_str) = ref |> back_ref.resolve(data, pos)
-  token_str |> string.inspect |> io.println
 }
